@@ -1,0 +1,522 @@
+
+
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Pizarra IA Pro</title>
+
+<style>
+:root {
+  --fondo: #0b1020;
+  --panel: #151d30;
+  --borde: #293650;
+  --texto: #f1f5f9;
+  --suave: #a4b1c7;
+  --acento: #7c6cff;
+  --azul: #4da3ff;
+}
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  background: var(--fondo);
+  color: var(--texto);
+  font-family: "Segoe UI", Arial, sans-serif;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px;
+  border-bottom: 1px solid var(--borde);
+  background: #10172a;
+}
+.marca {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.logo {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: 13px;
+  font-size: 23px;
+  background: linear-gradient(135deg, #7c6cff, #35c9e8);
+}
+h1 { font-size: 21px; margin: 0; }
+.subtitulo { color: var(--suave); font-size: 12px; margin-top: 4px; }
+.estado {
+  color: #86efac;
+  font-size: 12px;
+  background: #153526;
+  padding: 8px 12px;
+  border-radius: 20px;
+}
+main {
+  max-width: 1500px;
+  margin: auto;
+  padding: 22px;
+}
+.intro { margin-bottom: 18px; }
+.intro h2 { font-size: 23px; margin: 0 0 7px; }
+.intro p { color: var(--suave); margin: 0; font-size: 14px; }
+.layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--borde);
+  border-radius: 16px;
+  padding: 16px;
+}
+.panel h3 {
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--suave);
+  margin: 2px 0 14px;
+}
+.grupo { margin-bottom: 23px; }
+.herramientas {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+button, select, input {
+  font: inherit;
+}
+button {
+  cursor: pointer;
+}
+.herramienta, .accion {
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  padding: 11px 8px;
+  color: var(--texto);
+  background: #1b263d;
+  font-size: 13px;
+}
+.herramienta:hover, .accion:hover {
+  border-color: var(--azul);
+}
+.herramienta.activa {
+  background: #302c65;
+  border-color: var(--acento);
+  box-shadow: 0 0 0 1px var(--acento);
+}
+.icono {
+  display: block;
+  font-size: 21px;
+  margin-bottom: 6px;
+}
+label {
+  display: block;
+  font-size: 12px;
+  color: var(--suave);
+  margin-bottom: 10px;
+}
+input[type="range"] {
+  width: 100%;
+  accent-color: var(--acento);
+  margin-top: 10px;
+}
+input[type="color"] {
+  display: block;
+  width: 100%;
+  height: 40px;
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+  padding: 3px;
+  background: #1b263d;
+  cursor: pointer;
+}
+select, .campo-texto {
+  width: 100%;
+  background: #0e1729;
+  color: var(--texto);
+  border: 1px solid var(--borde);
+  border-radius: 9px;
+  padding: 10px;
+  margin-top: 6px;
+}
+.acciones { display: grid; gap: 8px; }
+.primario {
+  background: linear-gradient(135deg, #7667ff, #526df5);
+  border: none;
+}
+.peligro { color: #ffb4b4; }
+.nota {
+  color: var(--suave);
+  font-size: 11px;
+  line-height: 1.6;
+  margin-top: 14px;
+}
+.zona { min-width: 0; }
+.barra-superior {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.etiqueta { color: var(--suave); font-size: 13px; }
+.lienzo-contenedor {
+  background: #202b40;
+  border: 1px solid var(--borde);
+  border-radius: 15px;
+  padding: 12px;
+  overflow: hidden;
+}
+canvas {
+  display: block;
+  width: 100%;
+  height: min(65vh, 650px);
+  min-height: 320px;
+  background: white;
+  border-radius: 8px;
+  cursor: crosshair;
+  touch-action: none;
+}
+.pie {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--suave);
+  font-size: 12px;
+}
+@media (max-width: 760px) {
+  header { padding: 14px; }
+  main { padding: 13px; }
+  .layout { grid-template-columns: 1fr; }
+  .panel { order: 2; }
+  .zona { order: 1; }
+  .herramientas { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .herramienta { padding: 9px 3px; font-size: 11px; }
+  .icono { font-size: 19px; }
+  canvas { height: 55vh; min-height: 280px; }
+}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="marca">
+    <div class="logo">✎</div>
+    <div>
+      <h1>Pizarra IA <span style="color:#8b80ff">Pro</span></h1>
+      <div class="subtitulo">Tu espacio creativo digital</div>
+    </div>
+  </div>
+  <div class="estado">● Lista para usar</div>
+</header>
+
+<main>
+  <section class="intro">
+    <h2>Tu espacio de trabajo</h2>
+    <p>Dibuja, escribe ideas y guarda tus creaciones.</p>
+  </section>
+
+  <div class="layout">
+    <aside class="panel">
+      <div class="grupo">
+        <h3>Herramientas</h3>
+        <div class="herramientas">
+          <button class="herramienta activa" data-tool="pen">
+            <span class="icono">✎</span>Lápiz
+          </button>
+          <button class="herramienta" data-tool="eraser">
+            <span class="icono">▱</span>Borrador
+          </button>
+          <button class="herramienta" data-tool="line">
+            <span class="icono">╱</span>Línea
+          </button>
+          <button class="herramienta" data-tool="rect">
+            <span class="icono">□</span>Rectángulo
+          </button>
+        </div>
+      </div>
+
+      <div class="grupo">
+        <h3>Personalización</h3>
+        <label for="color">Color del trazo</label>
+        <input type="color" id="color" value="#252b43">
+
+        <label for="grosor" style="margin-top:16px">
+          Grosor: <span id="valorGrosor">4</span> px
+        </label>
+        <input type="range" id="grosor" min="1" max="35" value="4">
+
+        <label for="fondo" style="margin-top:16px">Fondo de la pizarra</label>
+        <select id="fondo">
+          <option value="#ffffff">Blanco</option>
+          <option value="#fffdf0">Crema</option>
+          <option value="#f0f7ff">Azul claro</option>
+          <option value="#e8f5e9">Verde claro</option>
+          <option value="#202638">Oscuro</option>
+        </select>
+      </div>
+
+      <div class="grupo">
+        <h3>Añadir texto</h3>
+        <label for="texto">Escribe tu texto</label>
+        <input class="campo-texto" id="texto" type="text"
+          placeholder="Mi idea...">
+        <button class="accion primario" id="agregarTexto"
+          style="width:100%; margin-top:9px">
+          + Añadir texto
+        </button>
+      </div>
+
+      <div class="grupo">
+        <h3>Acciones</h3>
+        <div class="acciones">
+          <button class="accion" id="deshacer">↶ Deshacer</button>
+          <button class="accion peligro" id="limpiar">⌫ Limpiar pizarra</button>
+          <button class="accion primario" id="descargar">↓ Guardar como PNG</button>
+        </div>
+      </div>
+
+      <div class="nota">
+        Consejo: usa el mouse o el dedo para dibujar. El borrador elimina trazos y figuras.
+      </div>
+    </aside>
+
+    <section class="zona">
+      <div class="barra-superior">
+        <span class="etiqueta">▣ Mi lienzo de trabajo</span>
+        <span class="etiqueta" id="estado">Herramienta: Lápiz</span>
+      </div>
+
+      <div class="lienzo-contenedor">
+        <canvas id="lienzo" width="1200" height="750"></canvas>
+      </div>
+
+      <div class="pie">
+        <span>● Cambios locales en esta sesión</span>
+        <span>Exporta tu trabajo para conservarlo.</span>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+const canvas = document.getElementById("lienzo");
+const ctx = canvas.getContext("2d");
+const color = document.getElementById("color");
+const grosor = document.getElementById("grosor");
+const fondo = document.getElementById("fondo");
+const valorGrosor = document.getElementById("valorGrosor");
+const estado = document.getElementById("estado");
+
+let herramienta = "pen";
+let dibujando = false;
+let inicio = null;
+let vistaPrevia = null;
+let historial = [];
+
+function pintarFondo() {
+  ctx.save();
+  ctx.globalCompositeOperation = "destination-over";
+  ctx.fillStyle = fondo.value;
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.restore();
+}
+
+function guardarEstado() {
+  if (historial.length >= 30) historial.shift();
+  historial.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+}
+
+function restaurarEstado(imagen) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.putImageData(imagen, 0, 0);
+}
+
+function punto(evento) {
+  const r = canvas.getBoundingClientRect();
+  return {
+    x: (evento.clientX - r.left) * canvas.width / r.width,
+    y: (evento.clientY - r.top) * canvas.height / r.height
+  };
+}
+
+function estiloTrazo() {
+  ctx.lineWidth = Number(grosor.value);
+  ctx.lineCap = "round";
+  ctx.lineJoin = "round";
+  ctx.strokeStyle = color.value;
+  ctx.fillStyle = color.value;
+}
+
+function trazarFigura(a, b) {
+  ctx.beginPath();
+  if (herramienta === "line") {
+    ctx.moveTo(a.x, a.y);
+    ctx.lineTo(b.x, b.y);
+    ctx.stroke();
+  } else if (herramienta === "rect") {
+    ctx.strokeRect(a.x, a.y, b.x - a.x, b.y - a.y);
+  }
+}
+
+document.querySelectorAll("[data-tool]").forEach(boton => {
+  boton.addEventListener("click", () => {
+    herramienta = boton.dataset.tool;
+    document.querySelectorAll("[data-tool]").forEach(b =>
+      b.classList.toggle("activa", b === boton)
+    );
+    const nombres = {
+      pen: "Lápiz",
+      eraser: "Borrador",
+      line: "Línea",
+      rect: "Rectángulo"
+    };
+    estado.textContent = "Herramienta: " + nombres[herramienta];
+    canvas.style.cursor = herramienta === "eraser" ? "cell" : "crosshair";
+  });
+});
+
+grosor.addEventListener("input", () => {
+  valorGrosor.textContent = grosor.value;
+});
+
+canvas.addEventListener("pointerdown", evento => {
+  evento.preventDefault();
+  canvas.setPointerCapture(evento.pointerId);
+  guardarEstado();
+  dibujando = true;
+  inicio = punto(evento);
+  vistaPrevia = ctx.getImageData(0, 0, canvas.width, canvas.height);
+
+  if (herramienta === "pen" || herramienta === "eraser") {
+    ctx.beginPath();
+    ctx.moveTo(inicio.x, inicio.y);
+    estiloTrazo();
+    if (herramienta === "eraser") {
+      ctx.globalCompositeOperation = "destination-out";
+      ctx.lineWidth = Math.max(12, Number(grosor.value) * 3);
+    }
+  }
+});
+
+canvas.addEventListener("pointermove", evento => {
+  if (!dibujando) return;
+  evento.preventDefault();
+  const actual = punto(evento);
+
+  if (herramienta === "pen" || herramienta === "eraser") {
+    estiloTrazo();
+    ctx.globalCompositeOperation =
+      herramienta === "eraser" ? "destination-out" : "source-over";
+    if (herramienta === "eraser") {
+      ctx.lineWidth = Math.max(12, Number(grosor.value) * 3);
+    }
+    ctx.lineTo(actual.x, actual.y);
+    ctx.stroke();
+  } else {
+    restaurarEstado(vistaPrevia);
+    estiloTrazo();
+    trazarFigura(inicio, actual);
+  }
+});
+
+function terminar(evento) {
+  if (!dibujando) return;
+  if (herramienta === "line" || herramienta === "rect") {
+    const actual = punto(evento);
+    restaurarEstado(vistaPrevia);
+    estiloTrazo();
+    trazarFigura(inicio, actual);
+  }
+  ctx.globalCompositeOperation = "source-over";
+  dibujando = false;
+  inicio = null;
+  vistaPrevia = null;
+}
+
+canvas.addEventListener("pointerup", terminar);
+canvas.addEventListener("pointercancel", terminar);
+
+document.getElementById("agregarTexto").addEventListener("click", () => {
+  const entrada = document.getElementById("texto");
+  const contenido = entrada.value.trim();
+  if (!contenido) {
+    alert("Primero escribe un texto.");
+    entrada.focus();
+    return;
+  }
+  guardarEstado();
+  ctx.save();
+  ctx.globalCompositeOperation = "source-over";
+  ctx.fillStyle = color.value;
+  ctx.font = "bold 30px Arial";
+  ctx.textBaseline = "top";
+  const palabras = contenido.split(/\s+/);
+  let linea = "";
+  let y = 45;
+  const maxAncho = canvas.width - 90;
+
+  palabras.forEach(palabra => {
+    const prueba = linea ? linea + " " + palabra : palabra;
+    if (ctx.measureText(prueba).width > maxAncho && linea) {
+      ctx.fillText(linea, 45, y);
+      linea = palabra;
+      y += 40;
+    } else {
+      linea = prueba;
+    }
+  });
+  if (linea) ctx.fillText(linea, 45, y);
+  ctx.restore();
+  entrada.value = "";
+});
+
+document.getElementById("deshacer").addEventListener("click", () => {
+  if (!historial.length) {
+    alert("Todavía no hay acciones para deshacer.");
+    return;
+  }
+  restaurarEstado(historial.pop());
+});
+
+document.getElementById("limpiar").addEventListener("click", () => {
+  if (!confirm("¿Quieres borrar todo el contenido de la pizarra?")) return;
+  guardarEstado();
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+});
+
+document.getElementById("descargar").addEventListener("click", () => {
+  const salida = document.createElement("canvas");
+  salida.width = canvas.width;
+  salida.height = canvas.height;
+  const sctx = salida.getContext("2d");
+  sctx.fillStyle = fondo.value;
+  sctx.fillRect(0, 0, salida.width, salida.height);
+  sctx.drawImage(canvas, 0, 0);
+  const enlace = document.createElement("a");
+  enlace.download = "mi-pizarra.png";
+  enlace.href = salida.toDataURL("image/png");
+  enlace.click();
+});
+
+fondo.addEventListener("change", () => {
+  canvas.style.backgroundColor = fondo.value;
+});
+
+canvas.style.backgroundColor = fondo.value;
+</script>
+</body>
+</html>
+
